@@ -130,3 +130,4 @@ dist
 .pnp.*
 
 terraform.tfstate
+.terraform
