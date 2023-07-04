@@ -4,6 +4,49 @@ A simple node app to test GCP stack deployments.
 ---
 ## Stack
 
+### Folder and Project Structure
+The trick here is to organize projects into folders that allow us to have a highly privileged Terraform agent across all projects managed by IaC, while keeping it from being able to self-escalate its own permissions beyond its sandbox and thus throughout the entire GCP account.
+
+```bash
+# Folder / Project Structure and Service Accounts
+
+📁 Terraform-Managed-Resources (Folder)
+├── 📁 Terraform-Managed-Projects (Folder)
+│   ├── 📁 My-App (Folder)
+│   │   └── 🚀 My-App (Project)
+│   │   │   ├── 👤 Resource1 (Service Account)
+│   │   │   └── 👤 Resource2 (Service Account)
+│   └── 📁 My-App-Dev (Folder)
+│   │   ├── 🚀 My-App-Staging (Project)
+│   │   │   └── 👤 Resource1 (Service Account)
+│   │   ├── 🚀 My-App-PR-456 (Project)
+│   │   │   └── 👤 Resource1 (Service Account)
+│   │   └── 🚀 My-App-PR-123 (Project)
+│   │   │   └── 👤 Resource1 (Service Account)
+│   ├── 📁 Some-Other-App (Folder)
+│   │   └── 🚀 Some-Other-App (Project)
+│   │   │   └── 👤 Resource1 (Service Account)
+│   └── 📁 My-App-Dev (Folder)
+│       ├── 🚀 Some-Other-App-Staging (Project)
+│       │   └── 👤 Resource1 (Service Account)
+│       └── 🚀 Some-Other-App-PR-678 (Project)
+│           └── 👤 Resource1 (Service Account)
+└── 🚀 Terraform-Agents
+    └── 👤 Terraform (Service Account)
+```
+
+📁 <u>**Terraform-Managed-Resources (Folder):**</u>
+All Terraform-managed resources including the Terraform Agent Service Account are contained within a single root folder. This not only gives us the ability to keep these resources organized, but it gives us a way to give the Terraform Agent the high level of permissions it needs in order to manage project resources while keeping it contained within the account.
+
+📁 <u>**Terraform-Managed-Projects (Folder):**</u>
+Within the root IaC folder, all projects are contained within a sub-folder. This allows us to create the service accounts required to manage the resources for a given app or environment without allowing them to escalate the scope of their permissions to the level of the Terraform Agent and thus edit or affect resources for an app or environment that they should not have access to.
+
+🚀 <u>**Terraform-Managed-Projects (Project):**</u>
+Each app or environment will need a project to associate the service accounts required to manage its resources. Depending on system architecture needs over time, this could represent any number of applications, each of which will likely require at the very least one development and one production environment. For some applications, we may even want to automate the launch of unique environments on pull request "open" events.
+
+🚀 <u>**Terraform-Agents (Project):**</u>
+Every service account needs a project. This project only exists in order to create a service account for the terraform agent that is privileged enough to manage all projects managed by Terraform, while limiting it to only IaC projects.
+
 ### Static Front End
 An example of this type of architecture can be found [here](https://medium.com/swlh/setup-a-static-website-cdn-with-terraform-on-gcp-23c6937382c6)
 
