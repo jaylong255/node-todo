@@ -65,11 +65,19 @@ You will need a service account for the Terraform agent to interact with GCP. Th
 This is a dump of actions, not necessarily meant as instructions. It's more of a log of what I'm doing. It will need to be refined once everything is working and ideally repeated for verification.
 - Create a Terraform Cloud workspace
 - Create a GCP Service Account
-- Create a `credentials` variable in TF Cloud
-- Copy the Service Account credentials json and set the value of the `credentials` to the contents of the json.
+- Create a `GCP_CREDENTIALS` variable in TF Cloud
+- Copy the Service Account credentials json and set the value of the `GCP_CREDENTIALS` to the contents of the json.
 
 > NOTE: there was a blog post i had open earlier that documented this as gcloud commands. This is the ideal method because it's much easier to document and source control than console navigation instructions. It sucks that I lost it because it was dope and it looked comprehensive.
 - Create a `terraform` project for shared resources.
     - initially created the project on the root level with no organization
     - create a service account under the terraform project
-    - 
+    - copy the json to the 
+
+<u>***NEXT STEPS:***</u>
+- ***Create a demo project for testing.***
+- ***Add roles to the servcie account***
+- ***Set up CI for Terraform changes***
+
+(Need to determine the registry solution. Are we using the GitHub Registry or the GCP registry. Seems like GCP is easier to authenticate. GitHub is better for hosting NPM packages.)
+- ***Create a GitHub Action for building the api image with Docker***
