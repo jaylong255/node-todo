@@ -1,10 +1,9 @@
 # Node Todo
 A simple node app to test GCP stack deployments.
 
----
-## Stack
 
-### Folder and Project Structure
+---
+## Folder and Project Structure
 The trick here is to organize projects into folders that allow us to have a highly privileged Terraform agent across all projects managed by IaC, while keeping it from being able to self-escalate its own permissions beyond its sandbox and thus throughout the entire GCP account.
 
 ```bash
@@ -14,23 +13,32 @@ The trick here is to organize projects into folders that allow us to have a high
 ├── 📁 Terraform-Managed-Projects (Folder)
 │   ├── 📁 My-App (Folder)
 │   │   └── 🚀 My-App (Project)
-│   │   │   ├── 👤 Resource1 (Service Account)
-│   │   │   └── 👤 Resource2 (Service Account)
-│   └── 📁 My-App-Dev (Folder)
+│   │       ├── 👤 Resource1 (Service Account)
+│   │       └── 👤 Resource2 (Service Account)
+│   │    
+│   ├── 📁 My-App-Dev (Folder)
 │   │   ├── 🚀 My-App-Staging (Project)
 │   │   │   └── 👤 Resource1 (Service Account)
+│   │   │ 
 │   │   ├── 🚀 My-App-PR-456 (Project)
 │   │   │   └── 👤 Resource1 (Service Account)
+│   │   │ 
 │   │   └── 🚀 My-App-PR-123 (Project)
-│   │   │   └── 👤 Resource1 (Service Account)
+│   │       └── 👤 Resource1 (Service Account)
+│   │     
+│   │     
 │   ├── 📁 Some-Other-App (Folder)
 │   │   └── 🚀 Some-Other-App (Project)
-│   │   │   └── 👤 Resource1 (Service Account)
-│   └── 📁 My-App-Dev (Folder)
+│   │       └── 👤 Resource1 (Service Account)
+│   │     
+│   └── 📁 Some-Other-App-Dev (Folder)
 │       ├── 🚀 Some-Other-App-Staging (Project)
 │       │   └── 👤 Resource1 (Service Account)
+│       │
 │       └── 🚀 Some-Other-App-PR-678 (Project)
 │           └── 👤 Resource1 (Service Account)
+│
+│
 └── 🚀 Terraform-Agents
     └── 👤 Terraform (Service Account)
 ```
@@ -46,6 +54,8 @@ Each app or environment will need a project to associate the service accounts re
 
 🚀 <u>**Terraform-Agents (Project):**</u>
 Every service account needs a project. This project only exists in order to create a service account for the terraform agent that is privileged enough to manage all projects managed by Terraform, while limiting it to only IaC projects.
+---
+## Stack
 
 ### Static Front End
 An example of this type of architecture can be found [here](https://medium.com/swlh/setup-a-static-website-cdn-with-terraform-on-gcp-23c6937382c6)
@@ -106,10 +116,34 @@ You will need a service account for the Terraform agent to interact with GCP. Th
 [Workload Identity Federation](https://cloud.google.com/iam/docs/workload-identity-federation?_ga=2.22965950.-466698892.1687471982&_gac=1.226558831.1688398950.CjwKCAjw44mlBhAQEiwAqP3eVkyCPeYDllbX9O1yShtr8uB5oh_sdsoL5To1vLJLi2U2VzzJ9A7fLxoClDMQAvD_BwE)
 
 This is a dump of actions, not necessarily meant as instructions. It's more of a log of what I'm doing. It will need to be refined once everything is working and ideally repeated for verification.
+
+<u>**Terraform Cloud:**</u>
 - Create a Terraform Cloud workspace
 - Create a GCP Service Account
 - Create a `GCP_CREDENTIALS` variable in TF Cloud
 - Copy the Service Account credentials json and set the value of the `GCP_CREDENTIALS` to the contents of the json.
+- Copy the generated `main.tf` file from Terraform Cloud, particularly the config with the organization and workspaces values
+```hcl
+terraform {
+  cloud {
+    organization = "cyberworld-builders"
+
+    workspaces {
+      name = "todo-test"
+    }
+    required_providers {
+        google = {
+        source  = "hashicorp/google"
+        version = ">= 4.45.0"
+        }
+    }
+  }
+}
+```
+- Tested with `terraform plan` command locally
+
+<u>**Google Cloud:**</u>
+- Created a `Terraform-Managed-Resources` Folder
 
 > NOTE: there was a blog post i had open earlier that documented this as gcloud commands. This is the ideal method because it's much easier to document and source control than console navigation instructions. It sucks that I lost it because it was dope and it looked comprehensive.
 - Create a `terraform` project for shared resources.
@@ -124,3 +158,34 @@ This is a dump of actions, not necessarily meant as instructions. It's more of a
 
 (Need to determine the registry solution. Are we using the GitHub Registry or the GCP registry. Seems like GCP is easier to authenticate. GitHub is better for hosting NPM packages.)
 - ***Create a GitHub Action for building the api image with Docker***
+
+---
+
+## Command Reference
+>Many times, especially in the initial setup process, resources need to be created in GCP first and then imported into IaC (Terraform). The following are some useful commands for `gcloud` and `terraform` command line interfaces for launching and/or importing resources. 
+
+### GCP CLI (gcloud)
+Making a small number of basic one-time changes is often quick and simple to perform directly within the GCP console UI. Once you find that your changes are growing in number and complexity and/or need to be performed multiple times or reproduced; it makes more sense to use the CLI. 
+
+The CLI has the following advantages in this case:
+- It is easier to document, track and share precise instructions.
+- The console requires your browser to use a lot of your system memory and network bandwidth. Users often find that opening up mulitple tabs causes your machine to lag and screen shares can crash.
+- Navigating the console is often a more complex experience and can lead to more user errors.
+
+```bash
+# List Configurations
+gcloud config list
+
+# Create Configuration
+gcloud config configurations create config-name
+
+# Set Account (when managing mulitple accounts)
+gcloud config configurations activate config-name
+
+
+```
+
+Additional information on setting gcloud account configs can be found [here](https://medium.com/google-cloud/how-to-use-multiple-accounts-with-gcloud-848fdb53a39a).
+
+### TF CLI (terraform)
+Once certain resources are created in the console they will need to imported back into the Terraform state so that they can be tracked by IaC.
