@@ -1,6 +1,22 @@
 # Node Todo
 A simple node app to test GCP stack deployments.
 
+---
+## Requirements
+
+### I. <u>**Google Workspaces**</u>
+
+Follow the instructions [here](https://workspace.google.com/business/signup/welcome?hl=en&source=gafb-alpha_lp_business_6801119-globalnav-en&ga_region=noram&ga_country=us&ga_lang=en&gaFlag=true&__utma=61317162.2010452999.1688628651.1688628651.1688628692.2&__utmb=61317162.0.10.1688628695819&__utmc=61317162&__utmx=-&__utmz=61317162.1688628692.2.2.utmcsr=google|utmgclid=CjwKCAjwzJmlBhBBEiwAEJyLuz4C5uyGpG0O0dvaJYVEWzgrAfEsx-EpjU2fAWsfavgz7rEllrJFWRoCgSYQAvD_BwE|utmgclsrc=aw.ds|utmccn=na-US-all-en-dr-bkws-all-all-trial-e-dr-1605018|utmcmd=cpc|utmctr=KW_google%20workspace%20new%20account-ST_google%20workspace%20new%20account|utmcct=text-ad-none-any-DEV_c-CRE_658969970610-ADGP_Hybrid%20|%20BKWS%20-%20MIX%20|%20Txt_Google%20Workspace%20Top-KWID_43700076441559588-aud-1292411573747:kwd-967957961262&__utmv=-&__utmk=245003586) to set up Google Workspaces.
+
+Save the following details:
+
+1. **Organization Domain:** This is generally the web domain you configured your
+   Google Workspaces account with. Example: `mydomain.com`
+2. **Customer ID:** This is the random ID associated with your GCP account.
+   Details on how to find it here:
+   https://support.google.com/cloudidentity/answer/10070793
+
+### II. <u>**Google Cloud Platform**</u>
 
 ---
 ## Folder and Project Structure
@@ -39,7 +55,7 @@ The trick here is to organize projects into folders that allow us to have a high
 │           └── 👤 Resource1 (Service Account)
 │
 │
-└── 🚀 Terraform-Agents
+└── 🚀 terraform-agents
     └── 👤 Terraform (Service Account)
 ```
 
@@ -52,7 +68,7 @@ Within the root IaC folder, all projects are contained within a sub-folder. This
 🚀 <u>**Terraform-Managed-Projects (Project):**</u>
 Each app or environment will need a project to associate the service accounts required to manage its resources. Depending on system architecture needs over time, this could represent any number of applications, each of which will likely require at the very least one development and one production environment. For some applications, we may even want to automate the launch of unique environments on pull request "open" events.
 
-🚀 <u>**Terraform-Agents (Project):**</u>
+🚀 <u>**terraform-agents (Project):**</u>
 Every service account needs a project. This project only exists in order to create a service account for the terraform agent that is privileged enough to manage all projects managed by Terraform, while limiting it to only IaC projects.
 ---
 ## Stack
@@ -172,6 +188,9 @@ The CLI has the following advantages in this case:
 - The console requires your browser to use a lot of your system memory and network bandwidth. Users often find that opening up mulitple tabs causes your machine to lag and screen shares can crash.
 - Navigating the console is often a more complex experience and can lead to more user errors.
 
+<u>**Account Configuration Commands:**</u>
+>Additional information on setting gcloud account configs can be found [here](https://medium.com/google-cloud/how-to-use-multiple-accounts-with-gcloud-848fdb53a39a).
+
 ```bash
 # List Configurations
 gcloud config list
@@ -179,13 +198,29 @@ gcloud config list
 # Create Configuration
 gcloud config configurations create config-name
 
-# Set Account (when managing mulitple accounts)
+# Set Project
+gcloud config set project my-project-id
+
+# Set Account
+gcloud config set account my-account@example.com
+
+# Activate Config (when managing mulitple accounts)
 gcloud config configurations activate config-name
-
-
 ```
 
-Additional information on setting gcloud account configs can be found [here](https://medium.com/google-cloud/how-to-use-multiple-accounts-with-gcloud-848fdb53a39a).
+<u>**Create Folder and Project Structure:**</u>
+```bash
+
+# Create Root Folder
+gcloud resource-manager folders create --display-name=Terraform-Managed-Resources --organization=ORGANIZATION_ID
+
+# Create Terraform Agents Project
+gcloud projects create terraform-agents --folder=IAC_ROOT_FOLDER_ID
+
+# Create Terraform Managed Projects Folder
+gcloud resource-manager folders create --display-name=Terraform-Managed-Projects --folder=IAC_ROOT_FOLDER_ID
+```
+
 
 ### TF CLI (terraform)
 Once certain resources are created in the console they will need to imported back into the Terraform state so that they can be tracked by IaC.
