@@ -6,7 +6,7 @@ A simple node app to test GCP stack deployments.
 
 ### I. <u>**Google Workspaces**</u>
 
-Follow the instructions [here](https://workspace.google.com/business/signup/welcome?hl=en&source=gafb-alpha_lp_business_6801119-globalnav-en&ga_region=noram&ga_country=us&ga_lang=en&gaFlag=true&__utma=61317162.2010452999.1688628651.1688628651.1688628692.2&__utmb=61317162.0.10.1688628695819&__utmc=61317162&__utmx=-&__utmz=61317162.1688628692.2.2.utmcsr=google|utmgclid=CjwKCAjwzJmlBhBBEiwAEJyLuz4C5uyGpG0O0dvaJYVEWzgrAfEsx-EpjU2fAWsfavgz7rEllrJFWRoCgSYQAvD_BwE|utmgclsrc=aw.ds|utmccn=na-US-all-en-dr-bkws-all-all-trial-e-dr-1605018|utmcmd=cpc|utmctr=KW_google%20workspace%20new%20account-ST_google%20workspace%20new%20account|utmcct=text-ad-none-any-DEV_c-CRE_658969970610-ADGP_Hybrid%20|%20BKWS%20-%20MIX%20|%20Txt_Google%20Workspace%20Top-KWID_43700076441559588-aud-1292411573747:kwd-967957961262&__utmv=-&__utmk=245003586) to set up Google Workspaces.
+> Follow the instructions [here](https://workspace.google.com/business/signup/welcome?hl=en&source=gafb-alpha_lp_business_6801119-globalnav-en&ga_region=noram&ga_country=us&ga_lang=en&gaFlag=true&__utma=61317162.2010452999.1688628651.1688628651.1688628692.2&__utmb=61317162.0.10.1688628695819&__utmc=61317162&__utmx=-&__utmz=61317162.1688628692.2.2.utmcsr=google|utmgclid=CjwKCAjwzJmlBhBBEiwAEJyLuz4C5uyGpG0O0dvaJYVEWzgrAfEsx-EpjU2fAWsfavgz7rEllrJFWRoCgSYQAvD_BwE|utmgclsrc=aw.ds|utmccn=na-US-all-en-dr-bkws-all-all-trial-e-dr-1605018|utmcmd=cpc|utmctr=KW_google%20workspace%20new%20account-ST_google%20workspace%20new%20account|utmcct=text-ad-none-any-DEV_c-CRE_658969970610-ADGP_Hybrid%20|%20BKWS%20-%20MIX%20|%20Txt_Google%20Workspace%20Top-KWID_43700076441559588-aud-1292411573747:kwd-967957961262&__utmv=-&__utmk=245003586) to set up Google Workspaces.
 
 Save the following details:
 
@@ -70,6 +70,7 @@ Each app or environment will need a project to associate the service accounts re
 
 🚀 <u>**terraform-agents (Project):**</u>
 Every service account needs a project. This project only exists in order to create a service account for the terraform agent that is privileged enough to manage all projects managed by Terraform, while limiting it to only IaC projects.
+
 ---
 ## Stack
 
